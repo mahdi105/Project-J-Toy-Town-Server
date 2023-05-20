@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require("dotenv").config();
 
 // Middleware
@@ -40,21 +40,28 @@ async function run() {
     //All Toys Collection 
     const toysCollection = client.db('toysDB').collection('toys');
 
+    // GET => API for reading toy document from MongoDB
     app.get('/toys', async(req, res)=> {
       const category = req.query.category;
-      
       if(category){
         const query = {category: category};
         const result = await toysCollection.find(query).toArray();
         res.send(result);
-      }
-      // res.send(result)
-    })
-    // GET (for all toys)
-    app.get('/toys', async(req, res) => {
+      }else{
         const result = await toysCollection.find().toArray();
         res.send(result);
+      }
     })
+
+    // GET => API for reading a single Toy document from MongoDB
+    app.get('/toy/:id', async(req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const result = await toysCollection.findOne(query);
+      res.send(result);
+    })
+
+    // GET => 
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
