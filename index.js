@@ -39,6 +39,8 @@ async function run() {
     
     //All Toys Collection 
     const toysCollection = client.db('toysDB').collection('toys');
+    // Gallery Image Collection
+    const gallerImgCollection = client.db('galleryDB').collection('gallery');
 
     // GET => API for reading toy document from MongoDB
     app.get('/toys', async(req, res)=> {
@@ -61,7 +63,12 @@ async function run() {
       res.send(result);
     })
 
-    // GET => 
+    // GET => Read Gallery
+    app.get('/gallery', async(req, res) => {
+      const result = await gallerImgCollection.find().toArray();
+      res.send(result)
+    })
+     
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
