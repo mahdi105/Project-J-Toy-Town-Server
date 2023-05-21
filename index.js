@@ -46,22 +46,31 @@ async function run() {
     app.get('/toys', async (req, res) => {
       const category = req.query.category;
       const limit = parseInt(req.query.limit);
+      const queryString = req.query.name;
+      if(queryString){
+        const name = queryString.split(' ');
+        const capitalized = name.map(word => word.charAt(0).toUpperCase() + word.slice(1));
+        const capitalizedName = capitalized.join(' ');
+        const query = { name: capitalizedName };
+        const result = await toysCollection.find(query).toArray();
+        res.send(result);
+        return;
+      }
       if (category) {
         const query = { category: category };
         const result = await toysCollection.find(query).toArray();
-        res.send(result)
+        res.send(result);
         return;
       }
-      else if (limit) {
+      if (limit) {
         const result = await toysCollection.find().limit(limit).toArray();
         res.send(result)
-        return;
+        return
       }
-      else {
-        const result = await toysCollection.find().toArray();
-        res.send(result)
-        return;
-      }
+
+      const result = await toysCollection.find().toArray();
+      res.send(result)
+      return;
     })
 
     // GET => API for reading a single Toy document from MongoDB
