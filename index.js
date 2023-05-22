@@ -103,7 +103,21 @@ async function run() {
     })
     
     // PATCH => Update some field of a specific document
-    
+    app.patch('/toy/:id', async(req, res) => {
+      const updated = req.body;
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)};
+      const newToy = {
+        $set:{
+          price: updated.price,
+          quantity: updated.quantity,
+          description: updated.description
+        }
+      }
+      const result = await toysCollection.updateOne(filter, newToy);
+      res.send(result);
+    });
+
 
 
   } finally {
