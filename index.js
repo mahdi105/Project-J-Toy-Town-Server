@@ -50,13 +50,15 @@ async function run() {
       const email = req.query.email;
       // Sorting
       const sortOrder = req.query.sortOrder === 'desc' ? -1 : 1;
-      if(sortOrder && email){
-        const query = {'seller.email': email} 
-        const result = await toysCollection.find(query).sort({ price: sortOrder }).toArray();
-        res.send(result);
-        return;
+      if (sortOrder) {
+        if (email) {
+          const query = { 'seller.email': email }
+          const result = await toysCollection.find(query).sort({ price: sortOrder }).toArray();
+          res.send(result);
+          return;
+        }
       }
-      if(queryString){
+      if (queryString) {
         const name = queryString.split(' ');
         const capitalized = name.map(word => word.charAt(0).toUpperCase() + word.slice(1));
         const capitalizedName = capitalized.join(' ');
@@ -76,8 +78,8 @@ async function run() {
         res.send(result)
         return
       }
-      if(email){
-        const query = {'seller.email': email}
+      if (email) {
+        const query = { 'seller.email': email }
         const result = await toysCollection.find(query).toArray();
         res.send(result);
         return;
@@ -103,21 +105,21 @@ async function run() {
     })
 
     // DELETE => Delete a toy Document from toysDB of MongoDb
-    app.delete('/toy/:id', async(req, res) => {
+    app.delete('/toy/:id', async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)};
+      const query = { _id: new ObjectId(id) };
       const result = await toysCollection.deleteOne(query);
       res.send(result)
     })
-    
+
     // PATCH => Update some field of a specific document
-    app.patch('/toy/:id', async(req, res) => {
+    app.patch('/toy/:id', async (req, res) => {
       const updated = req.body;
       const newPrice = parseInt(updated.price);
       const id = req.params.id;
-      const filter = {_id: new ObjectId(id)};
+      const filter = { _id: new ObjectId(id) };
       const newToy = {
-        $set:{
+        $set: {
           price: newPrice,
           quantity: updated.quantity,
           description: updated.description
@@ -126,6 +128,26 @@ async function run() {
       const result = await toysCollection.updateOne(filter, newToy);
       res.send(result);
     });
+
+    // POST => Insert a toy document to toyDB of mongoDB
+    app.post('/toys', async(req, res) => {
+      const newToy = req.body;
+      const rating = parseFloat(newToy.rating);
+      const price = parseInt(newToy.price);
+      const quantity = parseInt(newToy.quantity);
+      const updated = {
+          category: newToy.category,
+          image: newToy.photo,
+          name: newToy.toyName,
+          price: price,
+          rating: rating,
+          seller: {name: newToy.seller, email: newToy.sellerMail},
+          quantity: quantity,
+          description: newToy.description
+      }
+      const result = await toysCollection.insertOne(updated);
+      res.send(result);
+    })
 
 
 
