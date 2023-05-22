@@ -47,6 +47,7 @@ async function run() {
       const category = req.query.category;
       const limit = parseInt(req.query.limit);
       const queryString = req.query.name;
+      const email = req.query.email;
       if(queryString){
         const name = queryString.split(' ');
         const capitalized = name.map(word => word.charAt(0).toUpperCase() + word.slice(1));
@@ -66,6 +67,12 @@ async function run() {
         const result = await toysCollection.find().limit(limit).toArray();
         res.send(result)
         return
+      }
+      if(email){
+        const query = {'seller.email': email}
+        const result = await toysCollection.find(query).toArray();
+        res.send(result);
+        return;
       }
 
       const result = await toysCollection.find().toArray();
