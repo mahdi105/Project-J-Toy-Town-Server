@@ -48,6 +48,14 @@ async function run() {
       const limit = parseInt(req.query.limit);
       const queryString = req.query.name;
       const email = req.query.email;
+      // Sorting
+      const sortOrder = req.query.sortOrder === 'desc' ? -1 : 1;
+      if(sortOrder && email){
+        const query = {'seller.email': email} 
+        const result = await toysCollection.find(query).sort({ price: sortOrder }).toArray();
+        res.send(result);
+        return;
+      }
       if(queryString){
         const name = queryString.split(' ');
         const capitalized = name.map(word => word.charAt(0).toUpperCase() + word.slice(1));
@@ -105,11 +113,12 @@ async function run() {
     // PATCH => Update some field of a specific document
     app.patch('/toy/:id', async(req, res) => {
       const updated = req.body;
+      const newPrice = parseInt(updated.price);
       const id = req.params.id;
       const filter = {_id: new ObjectId(id)};
       const newToy = {
         $set:{
-          price: updated.price,
+          price: newPrice,
           quantity: updated.quantity,
           description: updated.description
         }
