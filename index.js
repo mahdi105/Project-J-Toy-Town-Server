@@ -94,6 +94,17 @@ async function run() {
       res.send(result)
     })
 
+    // DELETE => Delete a toy Document from toysDB of MongoDb
+    app.delete('/toy/:id', async(req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const result = await toysCollection.deleteOne(query);
+      res.send(result)
+    })
+    
+    // PATCH => Update some field of a specific document
+    
+
 
   } finally {
     // Ensures that the client will close when you finish/error
